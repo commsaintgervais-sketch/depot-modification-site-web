@@ -1,0 +1,39 @@
+# Demandes web — Saint-Gervais Mont-Blanc
+
+Application mobile et ordinateur pour les agents : formulaire en quatre étapes, pièces jointes privées, espace de gestion, traitement et rapport hebdomadaire. React + Vite, Netlify Functions, Netlify Database pour les demandes et Netlify Blobs pour les fichiers.
+
+## Mise en ligne depuis GitHub
+
+1. Déposer les fichiers de ce projet à la racine du dépôt GitHub.
+2. Dans Netlify, importer ce dépôt et choisir la branche de production. `netlify.toml` renseigne la compilation (`npm run build`) et le dossier publié (`dist`).
+3. Dans les variables d’environnement Netlify, ajouter `ADMIN_CODE` avec le code demandé **4807** et `SESSION_SECRET` avec une chaîne aléatoire d’au moins 32 caractères. Portée : Functions. Ne pas ajouter ces secrets dans le code ou les variables VITE.
+4. Déployer. Le paquet `@netlify/database` et la migration du dossier `netlify/database/migrations` permettent le provisionnement de la base sur les offres Netlify compatibles. Vérifier sa disponibilité dans Data & Storage.
+5. Tester une demande, son fichier et la connexion à l’espace de gestion avant de diffuser le lien aux agents.
+
+Exemple de génération d’un secret : `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+
+Le code n’est jamais inclus dans le JavaScript public. La connexion utilise un cookie signé HttpOnly/Secure de 8 heures et une limite de 5 tentatives par adresse IP sur 15 minutes. Le code à quatre chiffres reste un accès partagé : ne diffuser qu’aux personnes chargées de la gestion.
+
+## E-mails sans service à configurer
+
+L’agent indique obligatoirement son adresse. Après « Marquer comme traitée », le bouton « Prévenir l’agent par e-mail » ouvre la messagerie de l’administrateur avec destinataire, objet et texte préremplis. **L’administrateur doit cliquer sur Envoyer dans sa messagerie.** Aucun envoi automatique ou accusé de livraison n’est prétendu. Une messagerie configurée sur l’appareil est nécessaire. Un envoi entièrement automatique demanderait un service d’envoi ou un serveur SMTP, volontairement absent de cette version.
+
+## Fichiers et rapports
+
+- Jusqu’à cinq fichiers par demande, chacun limité à 4 Mo : PDF, JPG, PNG, WebP, GIF, MP4, MOV, WebM. Pour les vidéos lourdes, un champ de lien de partage est prévu. Cette limite permet de rester sous la limite de charge utile des fonctions Netlify.
+- Les fichiers ne sont consultables que par une session administrateur. Une demande reste enregistrée si l’envoi d’un fichier échoue ; l’écran propose de réessayer ces fichiers pendant 30 minutes.
+- Le rapport contient les demandes selon leur **date de traitement**, avec dates civiles de Paris. Choisir le lundi souhaité : la période couvre sept jours inclusifs.
+- Export CSV compatible Excel et impression PDF depuis le navigateur. Le PDF ou le CSV peut être joint à l’e-mail adressé au Maire. Aucun envoi programmé n’est activé.
+- Les données de production persistent après les déploiements. Les stores de fichiers des prévisualisations sont isolés ; leurs pièces jointes ne sont pas les fichiers de production.
+
+## Développement et vérification
+
+Node 24 recommandé. `npm ci`, `npm test`, `npm run build`.
+
+`npm run dev` prévisualise uniquement l’interface. Pour les fonctions et le stockage : Netlify CLI récent, `netlify dev`, puis `netlify database migrations apply` pour la base locale. Fournir ADMIN_CODE et SESSION_SECRET via un `.env` local ignoré. Ne jamais appliquer manuellement les migrations contre la production : les déploiements les gèrent.
+
+## Budget et exploitation
+
+Le projet vise une petite utilisation municipale sur Netlify Free compatible avec Database. Hébergement, fonctions, base et stockage consomment les quotas/crédits Netlify ; la gratuité illimitée n’est pas garantie. Contrôler l’utilisation dans Netlify, notamment pour les vidéos. Pas d’abonnement ni clé de service e-mail requis.
+
+Les coordonnées et fichiers sont utilisés pour le traitement interne. Avant ouverture, définir avec la commune la durée de conservation et les modalités de suppression des données. Aucun outil analytique publicitaire n’est ajouté.
