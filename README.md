@@ -37,3 +37,17 @@ Node 24 recommandé. `npm ci`, `npm test`, `npm run build`.
 Le projet vise une petite utilisation municipale sur Netlify Free compatible avec Database. Hébergement, fonctions, base et stockage consomment les quotas/crédits Netlify ; la gratuité illimitée n’est pas garantie. Contrôler l’utilisation dans Netlify, notamment pour les vidéos. Pas d’abonnement ni clé de service e-mail requis.
 
 Les coordonnées et fichiers sont utilisés pour le traitement interne. Avant ouverture, définir avec la commune la durée de conservation et les modalités de suppression des données. Aucun outil analytique publicitaire n’est ajouté.
+
+## Charte, services et suppression
+
+La palette est centralisée dans les variables CSS : bleu `#072551`, blanc `#ffffff`, orange `#E18943`, texte `#272727`.
+
+Le champ Service propose les principaux services municipaux. « Ajouter un nouveau service » permet d’en saisir un autre ; il rejoint la liste commune après l’envoi réussi de la demande. La liste est conservée en base, même si une demande est supprimée. Les services déjà présents dans les demandes sont repris par la nouvelle migration. Les variantes de casse et d’espaces sont regroupées à l’envoi.
+
+Dans l’administration, le filtre Service s’applique aux demandes, compteurs et rapports (CSV/PDF). Un tri alphabétique par service est également disponible.
+
+La fiche d’une demande comporte « Supprimer la demande », puis une confirmation explicite. Cette action retire définitivement la demande et ses pièces jointes, et l’exclut des rapports futurs. En cas d’échec du stockage, la demande reste disponible pour réessayer la suppression ; certains fichiers peuvent déjà avoir été retirés. L’API vérifie la session administrateur et l’origine de la requête.
+
+La migration `20261120140000_services.sql` doit être appliquée par le déploiement Netlify avant utilisation de cette version. Aucune variable d’environnement supplémentaire n’est requise.
+
+Les tests et la compilation sont exécutés par GitHub Actions à chaque push.
