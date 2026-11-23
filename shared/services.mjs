@@ -1,3 +1,4 @@
+import {matchesPlatform,classifyPage} from './platforms.mjs';
 export const DEFAULT_SERVICES = ['Accueil / État civil','Administration générale','Communication','Culture','Bibliothèque','Services techniques','Urbanisme','Enfance / Jeunesse','Sports','Police municipale','CCAS / Action sociale','Finances','Ressources humaines'];
 export function normalizeService(value) {
  if(typeof value!=='string') throw new Error('Indiquez le nom du service.');
@@ -12,8 +13,8 @@ export function serviceOptions(values) {
  for(const value of values) {const name=String(value||'').trim().replace(/\s+/g,' '); if(name&&!names.has(serviceKey(name)))names.set(serviceKey(name),name);}
  return [...names.values()].sort((a,b)=>a.localeCompare(b,'fr'));
 }
-export function filterRequests(rows,{service='',status='all',search='',sort='date'}={}) {
+export function filterRequests(rows,{service='',status='all',search='',sort='date',platform=''}={}) {
  const query=serviceKey(search);
- return rows.filter(r=>matchesService(r,service)&&(status==='all'||r.status===status)&&serviceKey([r.title,r.name,r.service].join(' ')).includes(query))
+ return rows.filter(r=>matchesService(r,service)&&matchesPlatform(r,platform)&&(status==='all'||r.status===status)&&serviceKey([r.title,r.name,r.service,classifyPage(r.page).label,r.page,classifyPage(r.page).id||''].join(' ')).includes(query))
  .sort((a,b)=>(sort==='service'?a.service.localeCompare(b.service,'fr'):0)||new Date(b.created_at)-new Date(a.created_at));
 }

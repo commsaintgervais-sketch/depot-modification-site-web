@@ -51,3 +51,16 @@ La fiche d’une demande comporte « Supprimer la demande », puis une confirmat
 La migration `20261120140000_services.sql` doit être appliquée par le déploiement Netlify avant utilisation de cette version. Aucune variable d’environnement supplémentaire n’est requise.
 
 Les tests et la compilation sont exécutés par GitHub Actions à chaque push.
+
+## Classement Apidae / Site Web
+
+Le back-office classe automatiquement les demandes à partir de l’URL, y compris les anciennes demandes. Les pages de `saintgervais.com` ou `www.saintgervais.com` situées sous les arborescences suivantes sont indiquées **Apidae** :
+
+- `/jai-envie/evenement-et-animation/agenda/<fiche>`
+- `/jai-envie/commerces-services/<fiche>`
+
+Les autres URL, y compris les pages d’index de ces rubriques sans fiche, sont indiquées **Site Web**. Les paramètres et ancres n’influencent pas le classement. L’identifiant est extrait du suffixe `-fr-<numéro>` lorsqu’il est présent.
+
+La liste affiche séparément l’outil de modification, l’identifiant Apidae et le statut de traitement. Le détail indique où réaliser la modification. Les filtres par outil, service et statut se combinent ; la recherche accepte aussi l’URL ou l’identifiant. Les compteurs par outil portent sur le service sélectionné. Les rapports CSV/PDF respectent les filtres de service et d’outil et mentionnent la destination de modification.
+
+Ce classement ne modifie ni le formulaire ni les données historiques et ne nécessite aucune migration ou nouvelle variable d’environnement. Il n’envoie aucune modification directement à Apidae.
