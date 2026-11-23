@@ -10,18 +10,16 @@ test('classifies both provided URL trees and extracts the Apidae identifier',()=
  assert.equal(classifyPage(event+'?source=test#horaires').id,'6892509');
  assert.equal(classifyPage(shop.replace('www.','').replace(/\/$/,'')).value,'apidae');
  assert.equal(classifyPage('  '+event+'  ').value,'apidae');
- assert.deepEqual(classifyPage('https://saintgervais.com/jai-envie/commerces-services/nouvelle-fiche/'),{value:'apidae',label:'Apidae',id:null});
+ assert.deepEqual(classifyPage('https://saintgervais.com/jai-envie/commerces-services/nouvelle-fiche/'),{value:'web',label:'Site Web',id:null});
 });
 test('classifies other pages, malformed values and lookalike domains as Site Web',()=>{
  for(const value of [
  'https://www.saintgervais.com/mairie/',
  'https://www.saintgervais.com/jai-envie/evenement-et-animation/agenda/',
  'https://www.saintgervais.com/jai-envie/commerces-services/',
- 'https://www.saintgervais.com/jai-envie/commerces-services-bis/fiche-fr-123/',
  event.replace('www.saintgervais.com','www.saintgervais.com.example.org'),
  event.replace('www.saintgervais.com','example.org'),
  'https://www.saintgervais.com/?next='+encodeURIComponent(event),
- 'https://www.saintgervais.com/autre/fiche-fr-123/',
  event.replace('https:','ftp:'),'javascript:alert(1)','not a URL','',null
  ])assert.deepEqual(classifyPage(value),{value:'web',label:'Site Web',id:null},String(value));
 });
@@ -39,4 +37,17 @@ test('combines destination, service, status and search on existing requests',()=
  assert.ok(matchesPlatform(rows[0],''));
  assert.equal(pagePath(event),new URL(event).pathname);
  assert.equal(pagePath('invalid'),'invalid');
+});
+
+test('detects suffix across every directory, with optional slash, query and fragment',()=>{
+ for(const path of ['/autre/fiche-fr-123/','/jai-envie/commerces-services-bis/fiche-fr-123','/fr-123/','/dormir/hotel-fr-123/?utm=a#details'])
+  assert.equal(classifyPage('https://www.saintgervais.com'+path).id,'123');
+ for(const path of ['/fiche-fr-123/details/','/fiche-fr-abc/','/fiche-fr-123-extra/','/fiche/?next=fr-123/'])
+  assert.equal(classifyPage('https://www.saintgervais.com'+path).value,'web');
+});
+test('finds existing requests by receipt reference or complete UUID, case insensitive',()=>{
+ const rows=[{id:'ab12cd34-1234-4321-9876-123456789012',page:event,service:'Culture',status:'pending',created_at:'2026-11-20'}];
+ assert.equal(filterRequests(rows,{search:'AB12CD34'}).length,1);
+ assert.equal(filterRequests(rows,{search:rows[0].id}).length,1);
+ assert.equal(filterRequests(rows,{search:'FFFF1111'}).length,0);
 });

@@ -15,6 +15,6 @@ export function serviceOptions(values) {
 }
 export function filterRequests(rows,{service='',status='all',search='',sort='date',platform=''}={}) {
  const query=serviceKey(search);
- return rows.filter(r=>matchesService(r,service)&&matchesPlatform(r,platform)&&(status==='all'||r.status===status)&&serviceKey([r.title,r.name,r.service,classifyPage(r.page).label,r.page,classifyPage(r.page).id||''].join(' ')).includes(query))
+ return rows.filter(r=>matchesService(r,service)&&matchesPlatform(r,platform)&&(status==='all'||r.status===status)&&serviceKey([r.id,r.title,r.name,r.service,classifyPage(r.page).label,r.page,classifyPage(r.page).id||''].join(' ')).includes(query))
  .sort((a,b)=>(sort==='service'?a.service.localeCompare(b.service,'fr'):0)||new Date(b.created_at)-new Date(a.created_at));
 }

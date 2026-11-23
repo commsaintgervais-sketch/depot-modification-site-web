@@ -2,10 +2,6 @@ export const PLATFORMS = [
  {value:'apidae',label:'Apidae'},
  {value:'web',label:'Site Web'}
 ];
-const apidaePrefixes = [
- '/jai-envie/evenement-et-animation/agenda/',
- '/jai-envie/commerces-services/'
-];
 // Compute from the URL on every read so existing requests are classified too.
 export function classifyPage(value) {
  const fallback={value:'web',label:'Site Web',id:null};
@@ -13,8 +9,9 @@ export function classifyPage(value) {
   const url=new URL(String(value||'').trim());
   if(!['https:','http:'].includes(url.protocol)||!['saintgervais.com','www.saintgervais.com'].includes(url.hostname))return fallback;
   const path=url.pathname.toLowerCase();
-  if(!apidaePrefixes.some(prefix=>path.startsWith(prefix)&&path.slice(prefix.length).replaceAll('/','').length>0))return fallback;
-  return {value:'apidae',label:'Apidae',id:path.match(/-fr-(\d+)\/?$/)?.[1]||null};
+  const match=path.match(/(?:^|[-/])fr-(\d+)\/?$/);
+  if(!match)return fallback;
+  return {value:'apidae',label:'Apidae',id:match[1]};
  }catch{return fallback;}
 }
 export const matchesPlatform=(request,platform)=>!platform||classifyPage(request.page).value===platform;

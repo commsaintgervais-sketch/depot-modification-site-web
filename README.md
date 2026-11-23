@@ -16,7 +16,7 @@ Le code n’est jamais inclus dans le JavaScript public. La connexion utilise un
 
 ## E-mails sans service à configurer
 
-L’agent indique obligatoirement son adresse. Après « Marquer comme traitée », le bouton « Prévenir l’agent par e-mail » ouvre la messagerie de l’administrateur avec destinataire, objet et texte préremplis. **L’administrateur doit cliquer sur Envoyer dans sa messagerie.** Aucun envoi automatique ou accusé de livraison n’est prétendu. Une messagerie configurée sur l’appareil est nécessaire. Un envoi entièrement automatique demanderait un service d’envoi ou un serveur SMTP, volontairement absent de cette version.
+L’agent indique obligatoirement son adresse. Après « Marquer comme traitée », le bouton « Prévenir l’agent par e-mail » ouvre la messagerie de l’administrateur avec destinataire, objet et texte préremplis. **L’administrateur doit cliquer sur Envoyer dans sa messagerie.** Aucun envoi automatique ou accusé de livraison n’est prétendu. Une messagerie configurée sur l’appareil est nécessaire. Les notifications de traitement restent manuelles. Les nouveaux dépôts Apidae peuvent déclencher une notification native Netlify Forms, décrite ci-dessous.
 
 ## Fichiers et rapports
 
@@ -54,13 +54,24 @@ Les tests et la compilation sont exécutés par GitHub Actions à chaque push.
 
 ## Classement Apidae / Site Web
 
-Le back-office classe automatiquement les demandes à partir de l’URL, y compris les anciennes demandes. Les pages de `saintgervais.com` ou `www.saintgervais.com` situées sous les arborescences suivantes sont indiquées **Apidae** :
-
-- `/jai-envie/evenement-et-animation/agenda/<fiche>`
-- `/jai-envie/commerces-services/<fiche>`
-
-Les autres URL, y compris les pages d’index de ces rubriques sans fiche, sont indiquées **Site Web**. Les paramètres et ancres n’influencent pas le classement. L’identifiant est extrait du suffixe `-fr-<numéro>` lorsqu’il est présent.
+Le back-office classe automatiquement les demandes à partir de l’URL, y compris les anciennes demandes. Les pages de `saintgervais.com` ou `www.saintgervais.com` dont le chemin se termine par `fr-<numéro>` (avec ou sans slash final) sont indiquées **Apidae**, quelle que soit la rubrique. Les autres sont indiquées **Site Web**. Les paramètres et ancres n’influencent pas le classement. Le numéro de fiche est extrait de ce suffixe.
 
 La liste affiche séparément l’outil de modification, l’identifiant Apidae et le statut de traitement. Le détail indique où réaliser la modification. Les filtres par outil, service et statut se combinent ; la recherche accepte aussi l’URL ou l’identifiant. Les compteurs par outil portent sur le service sélectionné. Les rapports CSV/PDF respectent les filtres de service et d’outil et mentionnent la destination de modification.
 
 Ce classement ne modifie ni le formulaire ni les données historiques et ne nécessite aucune migration ou nouvelle variable d’environnement. Il n’envoie aucune modification directement à Apidae.
+
+## Références et notifications Apidae natives
+
+La référence du reçu (8 premiers caractères de l’UUID, en majuscules) apparaît dans la liste, le détail et les rapports. La recherche accepte cette référence ou l’UUID complet, disponible au survol de la référence dans le détail. Les anciennes demandes conservent leur référence.
+
+Pour activer les notifications sans service externe :
+1. Dans le projet Netlify `depot-site-saint-gervais`, ouvrir Forms et activer **Enable form detection**.
+2. Redéployer pour que `public/__forms.html` enregistre le formulaire `apidae-recap`.
+3. Dans Forms > Submission notifications > Add notification, choisir Email, le formulaire **apidae-recap** uniquement et **assistantot@saintgervais.com**.
+4. Si Netlify demande de confirmer l’adresse destinataire, cliquer le lien reçu. Selon le déploiement de cette fonctionnalité sur le compte, Netlify peut encore exiger un membre actif de l’équipe. Ne pas déclarer l’envoi actif avant validation du réglage.
+
+Après enregistrement du dépôt et tentative d’envoi des fichiers, le navigateur transmet le récapitulatif des demandes Apidae à Netlify Forms. Il contient référence, fiche Apidae, demande, coordonnées, commentaire, lien de partage, noms des fichiers effectivement transmis et lien vers le back-office. Les fichiers privés ne sont pas copiés dans Forms. Les demandes Site Web ne déclenchent pas ce récapitulatif.
+
+Une erreur de transmission affiche un avertissement avec un bouton pour réessayer le récapitulatif seul, sans recréer la demande. Il n’y a pas de file d’attente durable : fermeture de la page ou perte de connexion peuvent empêcher la transmission. Un délai d’attente peut aussi masquer un succès ; réessayer peut créer un doublon portant la même référence. L’acceptation par Forms ne prouve pas la livraison de l’e-mail : vérifier les soumissions vérifiées/spam et le réglage de notification. Les anciens dépôts ne sont pas réexpédiés.
+
+Supprimer une demande dans l’application ne supprime pas sa copie textuelle dans Netlify Forms ni l’e-mail déjà reçu. Gérer leur conservation séparément. Aucune variable d’environnement d’e-mail n’est nécessaire.
